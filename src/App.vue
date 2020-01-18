@@ -1,32 +1,42 @@
 <template>
-  <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
+  <div :class="$style.appContainer">
+    <header :class="$style.appHeader">
+      <div :class="$style.appNavContainer">
+        <nav :class="$style.appNav">
+          NavigationBar
+        </nav>
+      </div>
+    </header>
+    <div :class="$style.appMainContainer">
+      <router-view />
     </div>
-    <router-view />
   </div>
 </template>
 
-<style lang="scss">
-#app {
-  font-family: "Avenir", Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
+<style lang="scss" module>
+.appContainer {
+  overflow: auto;
 }
 
-#nav {
-  padding: 30px;
+.appHeader {
+  margin-bottom: 8px;
+}
 
-  a {
-    font-weight: bold;
-    color: #2c3e50;
+.appNavContainer {
+  width: 100%;
+  height: 100%;
+  border-bottom: 1px solid black;
+}
 
-    &.router-link-exact-active {
-      color: #42b983;
-    }
-  }
+.appNav {
+  padding: 16px 0;
+  margin: auto;
+  max-width: 1080px;
+}
+
+.appMainContainer {
+  min-height: 720px;
+  display: flex;
+  flex-direction: column;
 }
 </style>
