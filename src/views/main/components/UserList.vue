@@ -1,7 +1,7 @@
 <template>
   <div>
-    <div>User List - {{ totalUsers }}</div>
     <button @click="$emit('refetch')">refetch</button>
+    <div :class="$style.userCount">User List - {{ totalUsers }}</div>
     <ul :class="$style.userList">
       <User
         v-for="user in allUsers"
@@ -34,6 +34,10 @@ export default {
 </script>
 
 <style lang="scss" module>
+.userCount {
+  margin-top: 4px;
+}
+
 .userList {
   margin: 4px 0 0;
   padding: 0;

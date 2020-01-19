@@ -1,7 +1,16 @@
 <template>
-  <div :class="$style.mainContainer">
+  <MainContainer>
     <div v-if="$apollo.loading">Loading...</div>
     <template v-else>
+      <div :class="$style.githubLoginContainer">
+        <div v-if="hasToken">
+          <button @click="logout">
+            Logout
+          </button>
+          <Me :name="userInfos.me.name" :avatar="userInfos.me.avatar" />
+        </div>
+        <button v-else @click="goToGithubAuthLogin">Login using Github</button>
+      </div>
       <div :class="$style.buttonContainer">
         <button @click="addFakeUsers">Add fake users</button>
       </div>
@@ -11,37 +20,54 @@
         @refetch="refetch"
       />
     </template>
-  </div>
+  </MainContainer>
 </template>
 
 <script>
 import gql from 'graphql-tag'
 
+import MainContainer from '@/components/MainContainer.vue'
+import Me from './components/Me.vue'
 import UserList from './components/UserList.vue'
 
+const AUTH_LOGIN_URL = `https://github.com/login/oauth/authorize?client_id=${process.env.VUE_APP_CLIENT_ID}&scope=user`
+
 export default {
+  components: {
+    MainContainer,
+    Me,
+    UserList,
+  },
   apollo: {
     userInfos: {
       query: gql`
+        fragment userInfo on User {
+          githubLogin
+          name
+          avatar
+        }
+
         query userInfos {
           totalUsers
           allUsers {
-            githubLogin
-            name
-            avatar
+            ...userInfo
+          }
+          me {
+            ...userInfo
           }
         }
       `,
       update: data => data,
     },
   },
-  components: {
-    UserList,
-  },
   data() {
     return {
       userInfos: {},
+      hasToken: false,
     }
+  },
+  created() {
+    this.hasToken = !!localStorage.getItem('token')
   },
   methods: {
     async refetch() {
@@ -66,18 +92,19 @@ export default {
 
       await this.refetch()
     },
+    logout() {
+      localStorage.removeItem('token')
+      this.hasToken = false
+    },
+    goToGithubAuthLogin() {
+      window.location = AUTH_LOGIN_URL
+    },
   },
 }
 </script>
 
 <style lang="scss" module>
-.mainContainer {
-  margin: auto;
-  width: 100%;
-  max-width: 1080px;
-  flex-grow: 1;
-}
-
+.githubLoginContainer,
 .buttonContainer {
   margin-bottom: 16px;
 }
