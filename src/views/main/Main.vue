@@ -2,6 +2,9 @@
   <div :class="$style.mainContainer">
     <div v-if="$apollo.loading">Loading...</div>
     <template v-else>
+      <div :class="$style.buttonContainer">
+        <button @click="addFakeUsers">Add fake users</button>
+      </div>
       <UserList
         :total-users="userInfos.totalUsers"
         :all-users="userInfos.allUsers"
@@ -41,9 +44,27 @@ export default {
     }
   },
   methods: {
-    refetch() {
+    async refetch() {
       this.userInfos = {}
-      this.$apollo.queries.userInfos.refetch()
+      await this.$apollo.queries.userInfos.refetch()
+    },
+    async addFakeUsers() {
+      await this.$apollo.mutate({
+        mutation: gql`
+          mutation addFakeUsers($count: Int!) {
+            addFakeUsers(count: $count) {
+              name
+              githubLogin
+              avatar
+            }
+          }
+        `,
+        variables: {
+          count: 3,
+        },
+      })
+
+      await this.refetch()
     },
   },
 }
@@ -55,5 +76,9 @@ export default {
   width: 100%;
   max-width: 1080px;
   flex-grow: 1;
+}
+
+.buttonContainer {
+  margin-bottom: 16px;
 }
 </style>
