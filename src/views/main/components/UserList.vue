@@ -1,7 +1,7 @@
 <template>
   <div>
     <div>User List - {{ totalUsers }}</div>
-    <ul>
+    <ul :class="$style.userList">
       <User
         v-for="user in allUsers"
         :key="user.githubLogin"
@@ -32,4 +32,9 @@ export default {
 }
 </script>
 
-<style lang="scss" module></style>
+<style lang="scss" module>
+.userList {
+  margin: 4px 0 0;
+  padding: 0;
+}
+</style>

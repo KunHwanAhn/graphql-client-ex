@@ -1,6 +1,6 @@
 <template>
   <li :class="$style.userInfo">
-    <img :src="avatar" width="48" height="48" alt="github user avatar" />
+    <img :src="avatar" width="36" height="36" alt="github user avatar" />
     {{ name }}
   </li>
 </template>
@@ -24,6 +24,15 @@ export default {
 .userInfo {
   display: flex;
   align-items: center;
+
+  &::before {
+    content: '\B7';
+    margin-right: 4px;
+  }
+
+  & + & {
+    margin-top: 4px;
+  }
 
   img {
     margin-right: 4px;
