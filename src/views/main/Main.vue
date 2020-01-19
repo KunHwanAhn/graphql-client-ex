@@ -1,11 +1,13 @@
 <template>
   <div :class="$style.mainContainer">
     <div v-if="$apollo.loading">Loading...</div>
-    <UserList
-      v-else
-      :total-users="userInfos.totalUsers"
-      :all-users="userInfos.allUsers"
-    />
+    <template v-else>
+      <UserList
+        :total-users="userInfos.totalUsers"
+        :all-users="userInfos.allUsers"
+        @refetch="refetch"
+      />
+    </template>
   </div>
 </template>
 
@@ -37,6 +39,12 @@ export default {
     return {
       userInfos: {},
     }
+  },
+  methods: {
+    refetch() {
+      this.userInfos = {}
+      this.$apollo.queries.userInfos.refetch()
+    },
   },
 }
 </script>

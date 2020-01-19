@@ -1,6 +1,7 @@
 <template>
   <div>
     <div>User List - {{ totalUsers }}</div>
+    <button @click="$emit('refetch')">refetch</button>
     <ul :class="$style.userList">
       <User
         v-for="user in allUsers"
