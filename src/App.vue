@@ -19,7 +19,7 @@
 }
 
 .appHeader {
-  margin-bottom: 8px;
+  margin-bottom: 16px;
 }
 
 .appNavContainer {
