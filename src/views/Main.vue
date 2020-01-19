@@ -1,8 +1,23 @@
 <template>
   <div :class="$style.mainContainer">
-    This app is made by using Vue.js
+    <div v-if="$apollo.loading">Loading...</div>
+    <div v-else>{{ hello }}</div>
   </div>
 </template>
+
+<script>
+import gql from 'graphql-tag'
+
+export default {
+  apollo: {
+    hello: gql`
+      {
+        hello
+      }
+    `,
+  },
+}
+</script>
 
 <style lang="scss" module>
 .mainContainer {
