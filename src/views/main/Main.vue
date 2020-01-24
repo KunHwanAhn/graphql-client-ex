@@ -7,24 +7,38 @@
           <button @click="logout">
             Logout
           </button>
-          <Me :name="userInfos.me.name" :avatar="userInfos.me.avatar" />
+          <Me v-if="me" :name="me.name" :avatar="me.avatar" />
         </div>
         <button v-else @click="goToGithubAuthLogin">Login using Github</button>
       </div>
       <div :class="$style.buttonContainer">
-        <button @click="addFakeUsers">Add fake users</button>
+        <button :disabled="loading" @click="addFakeUsers">
+          Add fake users
+        </button>
       </div>
       <UserList
-        :total-users="userInfos.totalUsers"
-        :all-users="userInfos.allUsers"
+        :total-users="totalUsers"
+        :all-users="allUsers"
         @refetch="refetch"
       />
+      <div v-if="error">An error occurred: {{ error }}</div>
     </template>
   </MainContainer>
 </template>
 
 <script>
-import gql from 'graphql-tag'
+import { createNamespacedHelpers } from 'vuex'
+
+const {
+  mapState: mapUserInfoState,
+  mapActions: mapUserInfoActions,
+} = createNamespacedHelpers('userInfo')
+
+const {
+  mapState: mapMeState,
+  mapMutations: mapMeMutations,
+  mapActions: mapMeActions,
+} = createNamespacedHelpers('me')
 
 import MainContainer from '@/components/MainContainer.vue'
 import Me from './components/Me.vue'
@@ -38,62 +52,59 @@ export default {
     Me,
     UserList,
   },
-  apollo: {
-    userInfos: {
-      query: gql`
-        fragment userInfo on User {
-          githubLogin
-          name
-          avatar
-        }
-
-        query userInfos {
-          totalUsers
-          allUsers {
-            ...userInfo
-          }
-          me {
-            ...userInfo
-          }
-        }
-      `,
-      update: data => data,
-    },
-  },
   data() {
     return {
-      userInfos: {},
       hasToken: false,
+      loading: false,
     }
   },
-  created() {
+  computed: {
+    ...mapMeState(['me']),
+    ...mapUserInfoState(['totalUsers', 'allUsers']),
+  },
+  async created() {
     this.hasToken = !!localStorage.getItem('token')
+
+    await this.getUserInfos()
+    await this.getMe()
   },
   methods: {
+    ...mapMeMutations({
+      internalLogout: 'logout',
+    }),
+    ...mapMeActions(['getMe']),
+    ...mapUserInfoActions({
+      getUserInfos: 'getUserInfos',
+      internalAddFakeUsers: 'addFakeUsers',
+    }),
     async refetch() {
-      this.userInfos = {}
-      await this.$apollo.queries.userInfos.refetch()
+      this.loading = true
+      this.error = null
+
+      try {
+        await this.getUserInfos({ fetchPolicy: 'network-only' })
+      } catch (error) {
+        this.error = error
+      }
+
+      this.loading = false
     },
     async addFakeUsers() {
-      await this.$apollo.mutate({
-        mutation: gql`
-          mutation addFakeUsers($count: Int!) {
-            addFakeUsers(count: $count) {
-              name
-              githubLogin
-              avatar
-            }
-          }
-        `,
-        variables: {
-          count: 3,
-        },
-      })
+      this.loading = true
+      this.error = null
+
+      try {
+        await this.internalAddFakeUsers()
+      } catch (error) {
+        this.error = error
+      }
+
+      this.loading = false
 
       await this.refetch()
     },
     logout() {
-      localStorage.removeItem('token')
+      this.internalLogout()
       this.hasToken = false
     },
     goToGithubAuthLogin() {

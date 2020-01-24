@@ -1,7 +1,7 @@
 module.exports = {
   client: {
     service: {
-      name: 'my-app',
+      name: 'photo-share',
       // URL to the GraphQL API
       url: 'http://localhost:4000/graphql',
     },
