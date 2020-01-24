@@ -4,7 +4,7 @@ import apolloProvider from '@/plugins/vueApollo'
 
 const { defaultClient: apollo } = apolloProvider
 
-const query = gql`
+const userInfosQuery = gql`
   fragment userInfo on User {
     githubLogin
     name
@@ -19,10 +19,33 @@ const query = gql`
   }
 `
 
+const addFakeUsersMutation = gql`
+  fragment userInfo on User {
+    githubLogin
+    name
+    avatar
+  }
+
+  mutation addFakeUsers($count: Int!) {
+    addFakeUsers(count: $count) {
+      ...userInfo
+    }
+  }
+`
+
 export default {
-  async getUserInfos({ commit }) {
-    const { data } = await apollo.query({ query })
+  async getUserInfos({ commit }, options) {
+    const { data } = await apollo.query({
+      query: userInfosQuery,
+      ...options,
+    })
     commit('setTotalUsers', data.totalUsers)
     commit('setAllUsers', data.allUsers)
+  },
+  async addFakeUsers(context, count = 1) {
+    await apollo.mutate({
+      mutation: addFakeUsersMutation,
+      variables: { count },
+    })
   },
 }

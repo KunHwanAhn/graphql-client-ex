@@ -12,20 +12,22 @@
         <button v-else @click="goToGithubAuthLogin">Login using Github</button>
       </div>
       <div :class="$style.buttonContainer">
-        <button @click="addFakeUsers">Add fake users</button>
+        <button :disabled="loading" @click="addFakeUsers">
+          Add fake users
+        </button>
       </div>
       <UserList
         :total-users="totalUsers"
         :all-users="allUsers"
         @refetch="refetch"
       />
+      <div v-if="error">An error occurred: {{ error }}</div>
     </template>
   </MainContainer>
 </template>
 
 <script>
 import { createNamespacedHelpers } from 'vuex'
-import gql from 'graphql-tag'
 
 const {
   mapState: mapUserInfoState,
@@ -53,6 +55,7 @@ export default {
   data() {
     return {
       hasToken: false,
+      loading: false,
     }
   },
   computed: {
@@ -70,25 +73,33 @@ export default {
       internalLogout: 'logout',
     }),
     ...mapMeActions(['getMe']),
-    ...mapUserInfoActions(['getUserInfos']),
+    ...mapUserInfoActions({
+      getUserInfos: 'getUserInfos',
+      internalAddFakeUsers: 'addFakeUsers',
+    }),
     async refetch() {
-      await this.$apollo.queries.userInfos.refetch()
+      this.loading = true
+      this.error = null
+
+      try {
+        await this.getUserInfos({ fetchPolicy: 'network-only' })
+      } catch (error) {
+        this.error = error
+      }
+
+      this.loading = false
     },
     async addFakeUsers() {
-      await this.$apollo.mutate({
-        mutation: gql`
-          mutation addFakeUsers($count: Int!) {
-            addFakeUsers(count: $count) {
-              name
-              githubLogin
-              avatar
-            }
-          }
-        `,
-        variables: {
-          count: 3,
-        },
-      })
+      this.loading = true
+      this.error = null
+
+      try {
+        await this.internalAddFakeUsers()
+      } catch (error) {
+        this.error = error
+      }
+
+      this.loading = false
 
       await this.refetch()
     },
