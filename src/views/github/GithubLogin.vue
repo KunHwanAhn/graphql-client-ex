@@ -1,22 +1,20 @@
 <template>
   <MainContainer>
-    <ApolloMutation
-      :mutation="githubAuth"
-      :variables="{ code }"
-      @done="handleMutationDone"
-    >
-      <template #default="{ mutate, loading, error }">
-        <button :disabled="loading" @click="mutate()">Get access token</button>
-        <div :class="$style.messageContainer">
-          <div v-if="loading">Trying to get new access token</div>
-          <div v-if="error">An error occurred: {{ error }}</div>
-        </div>
-      </template>
-    </ApolloMutation>
+    <button :disabled="loading" @click="signInWithGithub">
+      Get access token
+    </button>
+    <div :class="$style.messageContainer">
+      <div v-if="loading">Trying to get new access token</div>
+      <div v-if="error">An error occurred: {{ error }}</div>
+    </div>
   </MainContainer>
 </template>
 
 <script>
+import { createNamespacedHelpers } from 'vuex'
+
+const { mapActions } = createNamespacedHelpers('me')
+
 import MainContainer from '@/components/MainContainer.vue'
 
 export default {
@@ -29,25 +27,25 @@ export default {
       required: true,
     },
   },
+  data() {
+    return {
+      loading: false,
+      error: null,
+    }
+  },
   methods: {
-    githubAuth(gql) {
-      return gql`
-        mutation getAccessToken($code: String!) {
-          githubAuth(code: $code) {
-            token
-            user {
-              githubLogin
-              name
-              avatar
-            }
-          }
-        }
-      `
-    },
-    handleMutationDone({ data }) {
-      const { token } = data.githubAuth
-      localStorage.setItem('token', token)
-      this.$router.replace('/')
+    ...mapActions(['getAccessToken']),
+    async signInWithGithub() {
+      this.loading = true
+
+      try {
+        await this.getAccessToken(this.code)
+        this.$router.replace('/')
+      } catch (error) {
+        this.error = error
+      }
+
+      this.loading = false
     },
   },
 }

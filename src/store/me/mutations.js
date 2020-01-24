@@ -4,7 +4,8 @@ export default {
       ...me,
     }
   },
-  resetMe(state) {
+  logout(state) {
+    localStorage.removeItem('token')
     state.me = null
   },
 }

@@ -66,7 +66,9 @@ export default {
     await this.getMe()
   },
   methods: {
-    ...mapMeMutations(['resetMe']),
+    ...mapMeMutations({
+      internalLogout: 'logout',
+    }),
     ...mapMeActions(['getMe']),
     ...mapUserInfoActions(['getUserInfos']),
     async refetch() {
@@ -91,8 +93,7 @@ export default {
       await this.refetch()
     },
     logout() {
-      localStorage.removeItem('token')
-      this.resetMe()
+      this.internalLogout()
       this.hasToken = false
     },
     goToGithubAuthLogin() {
