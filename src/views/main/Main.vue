@@ -7,7 +7,7 @@
           <button @click="logout">
             Logout
           </button>
-          <Me :name="userInfos.me.name" :avatar="userInfos.me.avatar" />
+          <Me v-if="me" :name="me.name" :avatar="me.avatar" />
         </div>
         <button v-else @click="goToGithubAuthLogin">Login using Github</button>
       </div>
@@ -15,8 +15,8 @@
         <button @click="addFakeUsers">Add fake users</button>
       </div>
       <UserList
-        :total-users="userInfos.totalUsers"
-        :all-users="userInfos.allUsers"
+        :total-users="totalUsers"
+        :all-users="allUsers"
         @refetch="refetch"
       />
     </template>
@@ -24,7 +24,19 @@
 </template>
 
 <script>
+import { createNamespacedHelpers } from 'vuex'
 import gql from 'graphql-tag'
+
+const {
+  mapState: mapUserInfoState,
+  mapActions: mapUserInfoActions,
+} = createNamespacedHelpers('userInfo')
+
+const {
+  mapState: mapMeState,
+  mapMutations: mapMeMutations,
+  mapActions: mapMeActions,
+} = createNamespacedHelpers('me')
 
 import MainContainer from '@/components/MainContainer.vue'
 import Me from './components/Me.vue'
@@ -38,40 +50,26 @@ export default {
     Me,
     UserList,
   },
-  apollo: {
-    userInfos: {
-      query: gql`
-        fragment userInfo on User {
-          githubLogin
-          name
-          avatar
-        }
-
-        query userInfos {
-          totalUsers
-          allUsers {
-            ...userInfo
-          }
-          me {
-            ...userInfo
-          }
-        }
-      `,
-      update: data => data,
-    },
-  },
   data() {
     return {
-      userInfos: {},
       hasToken: false,
     }
   },
-  created() {
+  computed: {
+    ...mapMeState(['me']),
+    ...mapUserInfoState(['totalUsers', 'allUsers']),
+  },
+  async created() {
     this.hasToken = !!localStorage.getItem('token')
+
+    await this.getUserInfos()
+    await this.getMe()
   },
   methods: {
+    ...mapMeMutations(['resetMe']),
+    ...mapMeActions(['getMe']),
+    ...mapUserInfoActions(['getUserInfos']),
     async refetch() {
-      this.userInfos = {}
       await this.$apollo.queries.userInfos.refetch()
     },
     async addFakeUsers() {
@@ -94,6 +92,7 @@ export default {
     },
     logout() {
       localStorage.removeItem('token')
+      this.resetMe()
       this.hasToken = false
     },
     goToGithubAuthLogin() {
