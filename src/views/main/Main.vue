@@ -56,6 +56,7 @@ export default {
     return {
       hasToken: false,
       loading: false,
+      error: null,
     }
   },
   computed: {
