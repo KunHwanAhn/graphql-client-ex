@@ -1,42 +1,12 @@
-import gql from 'graphql-tag'
-
 import apolloProvider from '@/plugins/vueApollo'
+import { userInfos, addFakeUsers } from '@/graphql/index.graphql'
 
 const { defaultClient: apollo } = apolloProvider
-
-const userInfosQuery = gql`
-  fragment userInfo on User {
-    githubLogin
-    name
-    avatar
-  }
-
-  query userInfos {
-    totalUsers
-    allUsers {
-      ...userInfo
-    }
-  }
-`
-
-const addFakeUsersMutation = gql`
-  fragment userInfo on User {
-    githubLogin
-    name
-    avatar
-  }
-
-  mutation addFakeUsers($count: Int!) {
-    addFakeUsers(count: $count) {
-      ...userInfo
-    }
-  }
-`
 
 export default {
   async getUserInfos({ commit }, options) {
     const { data } = await apollo.query({
-      query: userInfosQuery,
+      query: userInfos,
       ...options,
     })
     commit('setTotalUsers', data.totalUsers)
@@ -44,7 +14,7 @@ export default {
   },
   async addFakeUsers(context, count = 1) {
     await apollo.mutate({
-      mutation: addFakeUsersMutation,
+      mutation: addFakeUsers,
       variables: { count },
     })
   },

@@ -17,6 +17,10 @@ const routes = [
       code: route.query.code,
     }),
   },
+  {
+    path: '*',
+    redirect: '/',
+  },
 ]
 
 const router = new VueRouter({
