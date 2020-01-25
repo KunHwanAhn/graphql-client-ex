@@ -1,0 +1,33 @@
+fragment userInfo on User {
+  githubLogin
+  name
+  avatar
+}
+
+query getMe {
+  me {
+    ...userInfo
+  }
+}
+
+query userInfos {
+  totalUsers
+  allUsers {
+    ...userInfo
+  }
+}
+
+mutation getAccessToken($code: String!) {
+  githubAuth(code: $code) {
+    token
+    user {
+      ...userInfo
+    }
+  }
+}
+
+mutation addFakeUsers($count: Int!) {
+  addFakeUsers(count: $count) {
+    ...userInfo
+  }
+}
