@@ -1,0 +1,16 @@
+#import './fragments.graphql'
+
+query getMe {
+  me {
+    ...userInfo
+  }
+}
+
+mutation getAccessToken($code: String!) {
+  githubAuth(code: $code) {
+    token
+    user {
+      ...userInfo
+    }
+  }
+}

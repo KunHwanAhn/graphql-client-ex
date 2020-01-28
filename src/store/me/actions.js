@@ -1,5 +1,5 @@
 import apolloProvider from '@/plugins/vueApollo'
-import { getMe, getAccessToken } from '@/graphql/index.graphql'
+import { getMe, getAccessToken } from '@/graphql/me.graphql'
 
 const { defaultClient: apollo } = apolloProvider
 

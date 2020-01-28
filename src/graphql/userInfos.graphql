@@ -1,0 +1,15 @@
+#import './fragments.graphql'
+
+query userInfos {
+  totalUsers
+  allUsers {
+    ...userInfo
+  }
+}
+
+
+mutation addFakeUsers($count: Int!) {
+  addFakeUsers(count: $count) {
+    ...userInfo
+  }
+}
