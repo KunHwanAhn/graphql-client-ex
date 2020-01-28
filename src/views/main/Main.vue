@@ -1,28 +1,25 @@
 <template>
-  <MainContainer>
-    <div v-if="$apollo.loading">Loading...</div>
-    <template v-else>
-      <div :class="$style.githubLoginContainer">
-        <div v-if="hasToken">
-          <button @click="logout">
-            Logout
-          </button>
-          <Me v-if="me" :name="me.name" :avatar="me.avatar" />
-        </div>
-        <button v-else @click="goToGithubAuthLogin">Login using Github</button>
-      </div>
-      <div :class="$style.buttonContainer">
-        <button :disabled="loading" @click="addFakeUsers">
-          Add fake users
+  <MainContainer v-loading="loading">
+    <div :class="$style.githubLoginContainer">
+      <div v-if="hasToken">
+        <button @click="logout">
+          Logout
         </button>
+        <Me v-if="me" :name="me.name" :avatar="me.avatar" />
       </div>
-      <UserList
-        :total-users="totalUsers"
-        :all-users="allUsers"
-        @refetch="refetch"
-      />
-      <div v-if="error">An error occurred: {{ error }}</div>
-    </template>
+      <button v-else @click="goToGithubAuthLogin">Login using Github</button>
+    </div>
+    <div :class="$style.buttonContainer">
+      <button :disabled="loading" @click="addFakeUsers">
+        Add fake users
+      </button>
+    </div>
+    <UserList
+      :total-users="totalUsers"
+      :all-users="allUsers"
+      @refetch="refetch"
+    />
+    <div v-if="error">An error occurred: {{ error }}</div>
   </MainContainer>
 </template>
 
@@ -66,7 +63,7 @@ export default {
   async created() {
     this.hasToken = !!localStorage.getItem('token')
 
-    await this.getUserInfos()
+    await this.refetch()
     await this.getMe()
   },
   methods: {
