@@ -1,5 +1,5 @@
 import apolloProvider from '@/plugins/vueApollo'
-import { userInfos, addFakeUsers } from '@/graphql/index.graphql'
+import { userInfos, addFakeUsers } from '@/graphql/userInfos.graphql'
 
 const { defaultClient: apollo } = apolloProvider
 
