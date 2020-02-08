@@ -4,7 +4,7 @@ import ApolloClient from 'apollo-boost'
 
 Vue.use(VueApollo)
 
-const apolloClient = new ApolloClient({
+export const apollo = new ApolloClient({
   uri: 'http://localhost:4000/graphql',
   request(operation) {
     const token = localStorage.getItem('token')
@@ -18,7 +18,7 @@ const apolloClient = new ApolloClient({
 })
 
 const apolloProvider = new VueApollo({
-  defaultClient: apolloClient,
+  defaultClient: apollo,
 })
 
 export default apolloProvider

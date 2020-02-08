@@ -1,7 +1,5 @@
-import apolloProvider from '@/plugins/vueApollo'
+import { apollo } from '@/plugins/vueApollo'
 import { getMe, getAccessToken } from '@/graphql/me.graphql'
-
-const { defaultClient: apollo } = apolloProvider
 
 export default {
   async getMe({ commit }) {

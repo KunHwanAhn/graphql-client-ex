@@ -1,5 +1,5 @@
 <template>
-  <MainContainer>
+  <MainContainer v-loading="loading">
     <button :disabled="loading" @click="signInWithGithub">
       Get access token
     </button>

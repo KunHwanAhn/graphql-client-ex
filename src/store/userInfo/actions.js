@@ -1,7 +1,5 @@
-import apolloProvider from '@/plugins/vueApollo'
+import { apollo } from '@/plugins/vueApollo'
 import { userInfos, addFakeUsers } from '@/graphql/userInfos.graphql'
-
-const { defaultClient: apollo } = apolloProvider
 
 export default {
   async getUserInfos({ commit }, options) {
